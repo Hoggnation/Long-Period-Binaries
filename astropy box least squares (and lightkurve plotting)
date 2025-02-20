@@ -1,0 +1,50 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 20 10:12:54 2025
+
+@author: katie
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import lightkurve as lk
+from astropy.timeseries import BoxLeastSquares as bls
+
+# STOP DONT RUN THIS
+#lc_stitch_list = [None] * 1800 
+# RUN ONLY AT START AT RISK OF DELETING ALL DOWNLOADED LIGHT CURVES
+
+
+### DOWNLOADING CELL ###
+kep_num = 16  # put kepler number to download here
+
+if lc_stitch_list[kep_num]  is None:
+    search_result = lk.search_lightcurve(f"Kepler-{kep_num}", author="Kepler", cadence="long")
+
+    lcfs = search_result.download_all()
+
+    stitched_lc = lcfs.stitch()
+    
+    lc_stitch_list[kep_num] = stitched_lc
+    
+else: print("Light curve has already been downloaded")
+### END DOWNLOADING CELL ###
+
+
+### PLOTTING CELL ###
+plot_num = 16 #put number to plot light curve of here
+lc_stitch_list[plot_num].scatter()
+plt.title(f"Light Curve of Kepler-{plot_num}")
+### END PLOTTING CELL ###
+
+# BOX LEAST SQUARES with correction for infite flux values #
+model = bls(lc_stitch_list[kep_num]["time"],lc_stitch_list[kep_num]["flux"])
+periods = np.arange(30, 50, 0.1)
+bad = np.logical_not(np.isfinite(lc_stitch_list[16]["flux"]))
+lc_stitch_list[16]["flux"][bad] = 1.0
+lc_stitch_list[16]["flux_err"][bad] = 1.0
+periodogram = model.power(periods, 0.5)
+plt.errorbar(periodogram.period.value, periodogram.power, 
+             xerr=periodogram.depth_err, color='magenta', ecolor='black')
+plt.xlabel('period (days)')
+plt.ylabel('power')
