@@ -45,6 +45,6 @@ lc_stitch_list[16]["flux"][bad] = 1.0
 lc_stitch_list[16]["flux_err"][bad] = 1.0
 periodogram = model.power(periods, 0.5)
 plt.errorbar(periodogram.period.value, periodogram.power, 
-             xerr=periodogram.depth_err, color='magenta', ecolor='black')
+             yerr=periodogram.depth_err, color='magenta', ecolor='black')
 plt.xlabel('period (days)')
 plt.ylabel('power')
