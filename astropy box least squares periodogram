@@ -48,3 +48,28 @@ plt.errorbar(periodogram.period.value, periodogram.power,
              yerr=periodogram.depth_err, color='magenta', ecolor='black')
 plt.xlabel('period (days)')
 plt.ylabel('power')
+
+
+#Fold
+#bestperiod = periods[np.argmax(periodogram.power)]
+bestperiod = 228.776   #Kepler-16b planet period from Wikipedia
+print(bestperiod)
+plt.plot(times % bestperiod, lc_stitch_list[kep_num]["flux"].value, 
+         "k.", ms = 1)
+
+#Mask big transits
+cut = 0.97   #magic
+q = np.array(lc_stitch_list[kep_num]["flux"] < cut)
+k = 10  #magic
+s = np.roll(q, k)
+t = np.roll(q, -k)
+g = np.logical_or(q, s, t)
+h = np.logical_not(g)
+plt.plot(lc_stitch_list[kep_num]["time"][g].value % bestperiod, 
+         lc_stitch_list[kep_num]["flux"][g].value, 
+         "r.", ms = 1)
+plt.plot(lc_stitch_list[kep_num]["time"][h].value % bestperiod, 
+         lc_stitch_list[kep_num]["flux"][h].value, 
+         "k.", ms = 1)
+
+# Find Peaks #
